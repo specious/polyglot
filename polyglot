@@ -1,18 +1,151 @@
 #!/usr/bin/env bash
 
+function parse_comma_list() {
+  local tmp="$IFS"
+  IFS=","
+  local list=($1)
+  IFS="$tmp"
+  echo "${list[*]}"
+}
+
+if ! command -v trans &>/dev/null; then
+  echo "Please install: https://www.soimort.org/translate-shell/"
+  exit 1
+fi
+
+# Retrieve list of valid language codes
+codes=$(trans -list-codes)
+
+# Convert code list to associative array
+declare -A "codes=($(echo ${codes[@]} | sed 's/[^ ]*/[&]=&/g'))"
+
+# For lanaguages that have several variants, also index the generic language code
+for code in "${!codes[@]}"; do
+  stub=${code%-*}
+  codes[$stub]=$stub
+done
+
+function valid_lang() {
+  [[ -v codes[$1] ]]
+}
+
 # Escape sequences for highlighting
-_hi="\e[33m"
-_black="\e[0m"
+_YELLOW="\e[33m"
+_GREEN="\e[32m"
+_BLACK="\e[0m"
 
+# Source language
 from=en
-langs=(el hu sv)
 
-while read -rp "$from -> ${langs[*]}> " input; do
+# Use an associative array to make it easy to add/remove elements
+declare -A langs=([el]=el [hu]=hu [sv]=sv)
+
+echo "Type /? for help"
+echo
+
+while read -erp "$(echo -e "$_GREEN$from -> ${langs[*]:-[no languages]}>$_BLACK ")" input; do
   echo
 
-  for lang in ${langs[*]}; do
-    echo -e "$_hi$lang:$_black $(trans -b -s "$from" -t "$lang" "$input")"
-  done
+  if [ -z "$input" ]; then
+    echo 'Type /? for help'
+  elif [[ ${input:0:1} == '/' ]]; then
+    input=( $input )
+
+    # Isolate the command
+    cmd=${input[0]}
+
+    # Remove the command itself from the input (leave just the arguments)
+    input=${input[@]:1}
+
+    case $cmd in
+      /[ac] )
+        # Clear the language list if /c is the command
+        if [[ "$cmd" == /c ]]; then
+          langs=()
+        fi
+
+        list=($(parse_comma_list ${input[1]}))
+
+        for item in "${list[@]}"; do
+          if $(valid_lang $item); then
+            if [[ ! -v langs[$item] ]]; then
+              echo "Adding language: $item"
+
+              langs[$item]=$item
+            fi
+          else
+            echo "Invalid language code: $item"
+          fi
+        done
+
+        # If language list is now empty, suggest setting a language
+        if [ ${#langs[@]} -eq 0 ]; then
+          echo 'Type /a [lang] to set a language'
+        fi
+        ;;
+
+      /d )
+        list=($(parse_comma_list ${input[1]}))
+
+        for item in "${list[@]}"; do
+          if [[ -v langs[$item] ]]; then
+            echo "Removing language: $item"
+
+            unset langs[$item]
+          fi
+        done
+        ;;
+
+      /f )
+        if $(valid_lang ${input[1]}); then
+          echo "Setting source language: ${input[1]}"
+          from=${input[1]}
+        else
+          echo "Invalid source language: ${input[1]}"
+        fi
+        ;;
+
+      /l )
+        echo 'Supported languages:'
+        echo
+
+        # Print table of supported languages
+        trans -T
+        ;;
+
+      '/?' )
+        echo '/c {fr,de,bg,...} - clear languages (set them from scratch)'
+        echo '/a fr{,de,bg,...} - add language(s)'
+        echo '/d fr{,de,bg,...} - remove language(s)'
+        echo '/f pl             - set source language'
+        echo '/l                - show supported languages'
+        echo '/?                - print help'
+        echo '/q                - quit'
+        ;;
+
+      /q )
+        exit
+        ;;
+
+      * )
+        echo "Unknown command: $cmd"
+        ;;
+    esac
+  else
+    if [ ${#langs[@]} -eq 0 ]; then
+      echo 'Type /? for help'
+    else
+      # Enable warnings on the first translation query
+      nowarn=
+
+      for lang in ${langs[*]}; do
+        echo -e "$_YELLOW$lang:$_BLACK $(trans $nowarn -b -s "$from" -t "$lang" "$input")"
+
+        # Set -no-warn for subsequent translation
+        nowarn="-no-warn"
+      done
+    fi
+  fi
 
   echo
 done
