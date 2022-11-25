@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Escape sequences for highlighting
+_hi="\e[33m"
+_black="\e[0m"
+
+from=en
+langs=(el hu sv)
+
+while read -rp "$from -> ${langs[*]}> " input; do
+  echo
+
+  for lang in ${langs[*]}; do
+    echo -e "$_hi$lang:$_black $(trans -b -s "$from" -t "$lang" "$input")"
+  done
+
+  echo
+done
