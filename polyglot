@@ -141,15 +141,13 @@ do
     if [ ${#langs[@]} -eq 0 ]; then
       echo 'Type /? for help'
     else
-      # Enable warnings on the first translation query
-      nowarn=
-
+      # Launch asynchronous translation requests for all target languages
       for lang in ${langs[*]}; do
-        echo -e "$_YELLOW$lang:$_RESET $(trans $nowarn -b -s "$from" -t "$lang" "$input")"
-
-        # Set -no-warn for subsequent translation
-        nowarn="-no-warn"
+        echo -e "$_YELLOW$lang:$_RESET $(trans -no-warn -b -s "$from" -t "$lang" "$input")" &
       done
+
+      # Wait for all asynchronous requests to complete
+      wait
     fi
   fi
 
