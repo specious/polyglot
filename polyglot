@@ -141,6 +141,9 @@ do
     if [ ${#langs[@]} -eq 0 ]; then
       echo 'Type /? for help'
     else
+      # Trap ^C signal, so that it cancels the translation queries but doesn't quit the program
+      trap 'echo " - Cancelled query"' INT
+
       # Launch asynchronous translation requests for all target languages
       for lang in ${langs[*]}; do
         echo -e "$_YELLOW$lang:$_RESET $(trans -no-warn -b -s "$from" -t "$lang" "$input")" &
@@ -148,6 +151,9 @@ do
 
       # Wait for all asynchronous requests to complete
       wait
+
+      # Clear ^C trap
+      trap - INT
     fi
   fi
 
