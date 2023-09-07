@@ -17,14 +17,16 @@ Install [Translate Shell](https://github.com/soimort/translate-shell) and run th
 - In Termux, run:
   ```
   pkg install git translate-shell
-  git clone git@github.com:specious/polyglot.git
+  git clone https://github.com/specious/polyglot.git
   cd polyglot
   ./polyglot
   ```
 
 ### iOS
 
-It should be possible to run it with [iSH](https://github.com/ish-app/ish). However, [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802) currently prevents the requisite Translate Shell from working in iSH.
+It should in principle be possible to run it with [iSH](https://github.com/ish-app/ish). However, [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802) currently prevents the requisite Translate Shell from working in iSH.
+
+It might also be possible to run it with [Blink Shell](https://blink.sh).
 
 ## License
 

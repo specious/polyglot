@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+app_name=$(basename "$0")
+
+conf_dir="$HOME/.config/$app_name"
+conf_file="$conf_dir/$app_name.conf"
+
+function load_config() {
+  # Return __NONE__ if the value is not defined in the config file
+  (grep -E "^$1=" -m 1 "$conf_file" 2>/dev/null || echo "=__NONE__") | head -n 1 | cut -d '=' -f 2-
+}
+
 function parse_comma_list() {
   local tmp="$IFS"
   IFS=","
@@ -14,19 +24,19 @@ if ! command -v trans &>/dev/null; then
 fi
 
 # Retrieve list of valid language codes
-codes=$(trans -list-codes)
+valid_codes=$(trans -list-codes)
 
 # Convert code list to associative array
-declare -A "codes=($(echo ${codes[@]} | sed 's/[^ ]*/[&]=&/g'))"
+declare -A "valid_codes=($(echo ${valid_codes[@]} | sed 's/[^ ]*/[&]=&/g'))"
 
 # For lanaguages that have several variants, also index the generic language code
-for code in "${!codes[@]}"; do
+for code in "${!valid_codes[@]}"; do
   stub=${code%-*}
-  codes[$stub]=$stub
+  valid_codes[$stub]=$stub
 done
 
-function valid_lang() {
-  [[ -v codes[$1] ]]
+function is_valid_lang() {
+  [[ -v valid_codes[$1] ]]
 }
 
 # Escape sequences for highlighting
@@ -38,7 +48,59 @@ _RESET=$'\001\e[m\002'
 from=en
 
 # Use an associative array to make it easy to add/remove elements
-declare -A langs=([el]=el [hu]=hu [sv]=sv)
+declare -A langs
+
+function add_langs() {
+  local list=($(parse_comma_list $1))
+
+  for item in "${list[@]}"; do
+    if is_valid_lang $item; then
+      if [[ ! -v langs[$item] ]]; then
+        [[ -n $2 ]] && echo "Adding language: $item"
+
+        langs[$item]=$item
+      fi
+    else
+      echo "Invalid language code: $item"
+    fi
+  done
+}
+
+# Save source and target languages to configuration file
+function save_config() {
+  # Create the config directory if it doesn't exist
+  mkdir -p "$conf_dir"
+
+  local tmp="$IFS"
+  IFS=","
+  echo -e "from=$from\nto=${langs[*]}" > "$conf_file"
+  IFS="$tmp"
+}
+
+# Load source and target languages from configuration file
+function load_langs() {
+  # If configuration file doesn't exist, don't do anything
+  [ -f "$conf_file" ] || return 1
+
+  local val=$(load_config from)
+
+  if [[ $val != __NONE__ ]]; then
+    if is_valid_lang "$val"; then
+      from="$val"
+    else
+      echo "Invalid source language in configuration file: $val"
+    fi
+  fi
+
+  val=$(load_config to)
+
+  [[ $val == __NONE__ ]] && return 1
+
+  # Set target languages based on configuration file
+  add_langs "$val"
+}
+
+load_langs || langs=([el]=el [hu]=hu [sv]=sv)
 
 echo "Type /? for help"
 echo
@@ -70,19 +132,9 @@ do
           langs=()
         fi
 
-        list=($(parse_comma_list ${input[1]}))
+        add_langs "${input[1]}" 1
 
-        for item in "${list[@]}"; do
-          if $(valid_lang $item); then
-            if [[ ! -v langs[$item] ]]; then
-              echo "Adding language: $item"
-
-              langs[$item]=$item
-            fi
-          else
-            echo "Invalid language code: $item"
-          fi
-        done
+        save_config
 
         # If language list is now empty, suggest setting a language
         if [ ${#langs[@]} -eq 0 ]; then
@@ -100,12 +152,16 @@ do
             unset langs[$item]
           fi
         done
+
+        save_config
         ;;
 
       /f )
-        if $(valid_lang ${input[1]}); then
+        if is_valid_lang ${input[1]}; then
           echo "Setting source language: ${input[1]}"
           from=${input[1]}
+
+          save_config
         else
           echo "Invalid source language: ${input[1]}"
         fi
