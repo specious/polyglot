@@ -30,4 +30,4 @@ It might also be possible to run it with [Blink Shell](https://blink.sh).
 
 ## License
 
-ISC
+[ISC](LICENSE)
