@@ -12,11 +12,11 @@ Install [Translate Shell](https://github.com/soimort/translate-shell) and run th
 
 ### Android
 
-- Get [F-Droid](https://f-droid.org)
-- From F-Droid, install [Termux](https://f-droid.org/en/packages/com.termux/)
+- Install [Termux](https://termux.dev)
 - In Termux, run:
   ```
-  pkg install git translate-shell
+  pkg install git
+  pkg install --no-install-recommends translate-shell
   git clone https://github.com/specious/polyglot.git
   cd polyglot
   ./polyglot
