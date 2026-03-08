@@ -1,33 +1,65 @@
-Translate text to multiple languages simultaneously in an interactive terminal session.
+# Polyglot 🗣️  — Interactive Multi-Language Terminal Translator
+
+Translate text to **multiple languages simultaneously** via an interactive bash prompt. Powered by [translate-shell](https://github.com/soimort/translate-shell). Zero deps beyond that. Works on **Linux, macOS, Termux (Android)** — iOS via iSH/Blink Shell.
+
+**Perfect for:**
+
+- Comparing translations side-by-side (e.g. Romance, Germanic, Slavic languages)
+- People studying or working with multiple languages
+- Language learners spotting nuances
+- Polyglots & travelers (Termux/SSH-friendly)
+- Quick CLI lookups, no browser needed
+
+## Quick demo
 
 [![asciicast](https://asciinema.org/a/541313.svg)](https://asciinema.org/a/541313)
 
+## Commands
+
+```
+/c {fr,de,bg,...} - clear languages (set them from scratch)
+/a fr{,de,bg,...} - add language(s)
+/d fr{,de,bg,...} - remove language(s)
+/f pl             - set source language
+/l                - show supported languages
+/?                - print help
+/q                - quit
+```
+
 ## Installation
 
-Requires the [Translate Shell](https://github.com/soimort/translate-shell) command-line translator.
+### Any Unix-like (Linux/macOS)
 
-### Just about any OS
+1. Install [translate-shell](https://github.com/soimort/translate-shell) (e.g., `brew install translate-shell`)
+2. `git clone https://github.com/specious/polyglot.git && cd polyglot && ./polyglot`
 
-Install [Translate Shell](https://github.com/soimort/translate-shell) and run the script.
+### Android (Termux)
 
-### Android
-
-- Install [Termux](https://termux.dev)
-- In Termux, run:
-  ```
-  pkg install git
-  pkg install --no-install-recommends translate-shell
-  git clone https://github.com/specious/polyglot.git
-  cd polyglot
-  ./polyglot
-  ```
+```
+pkg add git translate-shell
+git clone https://github.com/specious/polyglot.git
+cd polyglot
+./polyglot
+```
 
 ### iOS
 
-It should in principle be possible to run it with [iSH](https://github.com/ish-app/ish). However, [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802) currently prevents the requisite Translate Shell from working in iSH.
+- Try [iSH Shell](https://ish.app) (note: translate-shell issue [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802))
+- Or [Blink Shell](https://blink.sh) for Mosh/SSH
 
-It might also be possible to run it with [Blink Shell](https://blink.sh).
+## Why you'll love it
+
+- **Zero config**
+- **Custom lang sets** (e.g., `/c es,pt,it,fr` for Romance)
+- **Portable** — same bash script everywhere
+- **Fast** interactive loop fetches all translations in parallel
+
+Typing `/l` shows list of supported languages.
+
+## Related
+
+Built for fans of [translate-shell](https://github.com/soimort/translate-shell). Star if useful!
 
 ## License
 
-[ISC](LICENSE)
+This project is licensed under ISC, a minimal permissive license functionally equivalent to MIT.
