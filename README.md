@@ -1,6 +1,6 @@
-# Polyglot 🗣️  — Interactive Multi-Language Terminal Translator
+# Polyglot 🗣️ — Interactive Multi-Language Terminal Translator
 
-Translate text to **multiple languages simultaneously** via an interactive bash prompt. Powered by [translate-shell](https://github.com/soimort/translate-shell). Zero deps beyond that. Works on **Linux, macOS, Termux (Android)** — iOS via iSH/Blink Shell.
+Translate text to **multiple languages simultaneously** via an interactive bash prompt. Powered by [translate-shell](https://github.com/soimort/translate-shell). Zero deps beyond that. Works on **Linux, macOS, Windows, Termux (Android)** — iOS via iSH/Blink Shell.
 
 **Perfect for:**
 
@@ -32,6 +32,10 @@ Translate text to **multiple languages simultaneously** via an interactive bash 
 
 1. Install [translate-shell](https://github.com/soimort/translate-shell) (e.g., `brew install translate-shell`)
 2. `git clone https://github.com/specious/polyglot.git && cd polyglot && ./polyglot`
+
+### Arch Linux
+
+Get the [polyglot-translate-git](https://aur.archlinux.org/packages/polyglot-translate-git) AUR package.
 
 ### Android (Termux)
 
