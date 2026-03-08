@@ -48,8 +48,8 @@ cd polyglot
 
 ### iOS
 
-- Try [iSH Shell](https://ish.app) (note: translate-shell issue [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802))
-- Or [Blink Shell](https://blink.sh) for Mosh/SSH
+- Currently doesn't work in [iSH](https://ish.app) (see: translate-shell issue [#1699](https://github.com/ish-app/ish/issues/1699#issuecomment-1332663802))
+- Might work in [Blink Shell](https://blink.sh) (really nice paid app)
 
 ## Why you'll love it
 
